@@ -1,0 +1,35 @@
+import { useState } from "react";
+//timer 
+//number of answered qns
+
+export function StartQuiz({ questions }) {
+  const [selected, setSelected] = useState({});
+
+  return (
+    <>
+      {questions.map((eachQuestion) => (
+        <div key={eachQuestion.id}>
+          <h2>{eachQuestion.question}</h2>
+
+          {eachQuestion.options.map((option, index) => (
+            <label key={index} style={{ display: "block" }}>
+              <input
+                type="radio"
+                name={`quiz-${eachQuestion.id}`}
+                value={option}
+                checked={selected[eachQuestion.id] === option}
+                onChange={(e) =>
+                  setSelected({
+                    ...selected,
+                    [eachQuestion.id]: e.target.value,
+                  })
+                }
+              />
+              {option}
+            </label>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+}

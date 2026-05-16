@@ -1,0 +1,5 @@
+export function SetQuestions(){
+  return(
+    <></>
+  );
+}
