@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Timer } from "./Timer";
 //timer 
 //number of answered qns
 
@@ -7,6 +8,7 @@ export function StartQuiz({ questions }) {
 
   return (
     <>
+      <Timer />
       {questions.map((eachQuestion) => (
         <div key={eachQuestion.id}>
           <h2>{eachQuestion.question}</h2>
