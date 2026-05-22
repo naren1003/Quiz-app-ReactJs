@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Timer } from "./Timer";
-//timer 
+//timer auto submit
 //number of answered qns
 
 export function StartQuiz({ questions }) {
   const [selected, setSelected] = useState({});
+  const [submit, setSubmit] = useState(0);
+  if(submit) console.log("submitted");
 
   return (
     <>
-      <Timer />
+      <Timer setSubmit = {setSubmit} />
       {questions.map((eachQuestion) => (
         <div key={eachQuestion.id}>
           <h2>{eachQuestion.question}</h2>
@@ -33,7 +35,7 @@ export function StartQuiz({ questions }) {
         </div>
       ))}
       <div>
-        <button>Submit</button>
+        <button onClick={()=>{setSubmit(1)}}>Submit</button>
       </div>
     </>
   );

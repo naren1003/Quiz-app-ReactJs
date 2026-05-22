@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function Timer() {
+export function Timer({ setSubmit }) {
   const [min, setMin] = useState(10);
   const [sec, setSec] = useState(0);
 
@@ -18,6 +18,8 @@ export function Timer() {
 
     return () => clearInterval(intervalId);
   }, [min, sec]);
+
+  if(min === 0 && sec === 0) setSubmit(1);
 
   return (
     <div>
