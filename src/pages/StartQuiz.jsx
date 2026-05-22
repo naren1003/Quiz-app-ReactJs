@@ -30,6 +30,9 @@ export function StartQuiz({ questions }) {
           ))}
         </div>
       ))}
+      <div>
+        <button>Submit</button>
+      </div>
     </>
   );
 }
