@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { SetQuestions } from "./pages/SetQuestion";
 import { StartQuiz } from "./pages/StartQuiz";
+import { Result } from "./pages/Result";
 import './App.css'
 
 function App() {
@@ -136,6 +137,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SetQuestions />} />
         <Route path="/quiz" element={<StartQuiz questions = {questions}/>} />
+        <Route path="/result" element = {<Result />} />
       </Routes>
     </BrowserRouter>
   )

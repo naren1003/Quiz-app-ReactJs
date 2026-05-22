@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { Timer } from "./Timer";
+import { useNavigate } from "react-router-dom";
 //timer auto submit
 //number of answered qns
 
 export function StartQuiz({ questions }) {
   const [selected, setSelected] = useState({});
   const [submit, setSubmit] = useState(0);
-  if(submit) console.log("submitted");
+  
+  const navigate = useNavigate();
+  if(submit === 1) 
+    navigate("/result");
 
   return (
     <>
       <Timer setSubmit = {setSubmit} />
+
       {questions.map((eachQuestion) => (
         <div key={eachQuestion.id}>
           <h2>{eachQuestion.question}</h2>
@@ -34,6 +39,7 @@ export function StartQuiz({ questions }) {
           ))}
         </div>
       ))}
+
       <div>
         <button onClick={()=>{setSubmit(1)}}>Submit</button>
       </div>
