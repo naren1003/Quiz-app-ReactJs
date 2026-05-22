@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Timer } from "./Timer";
 import { useNavigate } from "react-router-dom";
-//timer auto submit
+
 //number of answered qns
 
 export function StartQuiz({ questions }) {
   const [selected, setSelected] = useState({});
   const [submit, setSubmit] = useState(0);
-  
+
   const navigate = useNavigate();
   if(submit === 1) 
     navigate("/result");
