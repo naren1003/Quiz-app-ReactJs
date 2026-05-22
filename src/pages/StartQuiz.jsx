@@ -6,15 +6,21 @@ import { useNavigate } from "react-router-dom";
 
 export function StartQuiz({ questions }) {
   const [selected, setSelected] = useState({});
+  const [count, setCount] = useState(0);
   const [submit, setSubmit] = useState(0);
 
   const navigate = useNavigate();
-  if(submit === 1) 
+  if (submit === 1)
     navigate("/result");
 
   return (
     <>
-      <Timer setSubmit = {setSubmit} />
+      <div>
+        <Timer setSubmit={setSubmit} />
+        <div>
+          <h1>{count} / {questions.length}</h1>
+        </div>
+      </div>
 
       {questions.map((eachQuestion) => (
         <div key={eachQuestion.id}>
@@ -27,12 +33,15 @@ export function StartQuiz({ questions }) {
                 name={`quiz-${eachQuestion.id}`}
                 value={option}
                 checked={selected[eachQuestion.id] === option}
-                onChange={(e) =>
+                onChange={(e) => {
+                  // need to add count only once for one qn
                   setSelected({
                     ...selected,
                     [eachQuestion.id]: e.target.value,
-                  })
-                }
+                  });
+
+                  setCount((prev) => prev + 1);
+                }}
               />
               {option}
             </label>
@@ -41,7 +50,7 @@ export function StartQuiz({ questions }) {
       ))}
 
       <div>
-        <button onClick={()=>{setSubmit(1)}}>Submit</button>
+        <button onClick={() => { setSubmit(1) }}>Submit</button>
       </div>
     </>
   );
