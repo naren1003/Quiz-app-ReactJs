@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Home } from "./pages/Home";
 import { SetQuestions } from "./pages/SetQuestion";
 import { StartQuiz } from "./pages/StartQuiz";
 import { Result } from "./pages/Result";
@@ -129,13 +130,9 @@ function App() {
 
   return (
     <BrowserRouter>
-      <nav>
-        <Link to="/">Set Questions</Link>
-        <Link to="/quiz"> Start Quiz </Link>
-      </nav>
-
       <Routes>
-        <Route path="/" element={<SetQuestions />} />
+        <Route path="/" element={<Home />} />
+        <Route path="setQuiz" element={<SetQuestions />} /> 
         <Route path="/quiz" element={<StartQuiz questions = {questions}/>} />
         <Route path="/result" element = {<Result />} />
       </Routes>
