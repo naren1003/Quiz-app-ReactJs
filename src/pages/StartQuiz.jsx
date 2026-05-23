@@ -50,7 +50,13 @@ export function StartQuiz({ questions }) {
       ))}
 
       <div>
-        <button onClick={() => { setSubmit(1) }}>Submit</button>
+        <button
+          onClick={() => {
+            setSubmit(1);
+            localStorage.removeItem("quizTimer");
+          }}>
+          Submit
+        </button>
       </div>
     </>
   );
