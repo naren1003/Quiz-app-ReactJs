@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Timer } from "./Timer";
 import { useNavigate } from "react-router-dom";
+//local storage for count and the answers selected
 
 export function StartQuiz({ questions, setCorrectAnswers ,correctAnswers }) {
   const [selected, setSelected] = useState({});
