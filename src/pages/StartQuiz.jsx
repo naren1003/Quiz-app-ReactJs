@@ -34,13 +34,13 @@ export function StartQuiz({ questions }) {
                 value={option}
                 checked={selected[eachQuestion.id] === option}
                 onChange={(e) => {
-                  // need to add count only once for one qn
+                  if(!(eachQuestion.id in selected)) 
+                    setCount((prev) => prev + 1);
+
                   setSelected({
                     ...selected,
                     [eachQuestion.id]: e.target.value,
                   });
-
-                  setCount((prev) => prev + 1);
                 }}
               />
               {option}
