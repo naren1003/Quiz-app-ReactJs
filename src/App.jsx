@@ -4,6 +4,7 @@ import { SetQuestions } from "./pages/SetQuestion";
 import { StartQuiz } from "./pages/StartQuiz";
 import { Result } from "./pages/Result";
 import './App.css'
+import { useState } from "react";
 
 function App() {
   const questions = [
@@ -128,13 +129,15 @@ function App() {
     }
   ];
 
+  const [correctAnswers, setCorrectAnswers] = useState({});
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="setQuiz" element={<SetQuestions />} /> 
-        <Route path="/quiz" element={<StartQuiz questions = {questions}/>} />
-        <Route path="/result" element = {<Result />} />
+        <Route path="/quiz" element={<StartQuiz questions = {questions} correctAnswers = {correctAnswers} setCorrectAnswers={setCorrectAnswers}/>} />
+        <Route path="/result" element = {<Result correctAnswers = {correctAnswers}/>} />
       </Routes>
     </BrowserRouter>
   )

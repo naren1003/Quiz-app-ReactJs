@@ -2,9 +2,7 @@ import { useState } from "react";
 import { Timer } from "./Timer";
 import { useNavigate } from "react-router-dom";
 
-//number of answered qns
-
-export function StartQuiz({ questions }) {
+export function StartQuiz({ questions, setCorrectAnswers ,correctAnswers }) {
   const [selected, setSelected] = useState({});
   const [count, setCount] = useState(0);
   const [submit, setSubmit] = useState(0);
@@ -34,13 +32,27 @@ export function StartQuiz({ questions }) {
                 value={option}
                 checked={selected[eachQuestion.id] === option}
                 onChange={(e) => {
-                  if(!(eachQuestion.id in selected)) 
+                  const value = e.target.value; 
+
+                  if (!(eachQuestion.id in selected))
                     setCount((prev) => prev + 1);
 
                   setSelected({
                     ...selected,
-                    [eachQuestion.id]: e.target.value,
+                    [eachQuestion.id]: value,
                   });
+
+                  if (value === eachQuestion.answer) {
+                    setCorrectAnswers({
+                      ...correctAnswers,
+                      [eachQuestion.id]: 1,
+                    });
+                  } else {
+                    setCorrectAnswers({
+                      ...correctAnswers,
+                      [eachQuestion.id]: 0,
+                    });
+                  }
                 }}
               />
               {option}
