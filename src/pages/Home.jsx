@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import "./Home.css";
 
 export function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="home-container">
-      <div className="home-card">
+    <div className="app-page home-page">
+      <div className="page-card home-card">
+        <span className="eyebrow">QuizMaster</span>
         <h1 className="home-title">Welcome to QuizMaster</h1>
 
         <p className="home-description">
@@ -15,12 +15,22 @@ export function Home() {
         </p>
 
         <div className="button-group">
-          <button className="start-btn" onClick={()=>{
-            navigate("/quiz");
-          }}>Start Quiz</button>
-          <button className="create-btn" onClick={()=>{
-            navigate("/setQuiz");
-          }}>Create Quiz</button>
+          <button
+            className="start-btn"
+            onClick={() => {
+              navigate("/quiz");
+            }}
+          >
+            Start Quiz
+          </button>
+          <button
+            className="create-btn"
+            onClick={() => {
+              navigate("/setQuiz");
+            }}
+          >
+            Create Quiz
+          </button>
         </div>
 
         <div className="stats-container">
@@ -35,7 +45,7 @@ export function Home() {
           </div>
 
           <div className="stat-box">
-            <h2>∞</h2>
+            <h2>Unlimited</h2>
             <p>Learning Fun</p>
           </div>
         </div>
