@@ -81,6 +81,8 @@ export function StartQuiz({ questions, setCorrectAnswers ,correctAnswers }) {
           onClick={() => {
             setSubmit(1);
             localStorage.removeItem("quizTimer");
+            localStorage.removeItem("selected");
+            localStorage.removeItem("count");
           }}>
           Submit
         </button>
