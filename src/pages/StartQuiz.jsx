@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Timer } from "./Timer";
 import { useNavigate } from "react-router-dom";
-//local storage for count and the answers selected
 
 export function StartQuiz({ questions, setCorrectAnswers ,correctAnswers }) {
-  const [selected, setSelected] = useState({});
-  const [count, setCount] = useState(0);
+
+  const [selected, setSelected] = useState(() => {
+    return JSON.parse(localStorage.getItem("selected")) || {};
+  });
+
+  const [count, setCount] = useState(() => {
+    return JSON.parse(localStorage.getItem("count")) || 0;
+  });
   const [submit, setSubmit] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem("selected", JSON.stringify(selected));
+  }, [selected]);
+
+  // store count
+  useEffect(() => {
+    localStorage.setItem("count", JSON.stringify(count));
+  }, [count]);
 
   const navigate = useNavigate();
   if (submit === 1)
