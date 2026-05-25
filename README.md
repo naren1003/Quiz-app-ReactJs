@@ -24,38 +24,6 @@ QuizMaster is a React quiz application built with Vite. It lets users select and
 - ESLint
 - React Compiler through the Vite/Babel setup
 
-## Getting Started
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-Preview the production build:
-
-```bash
-npm run preview
-```
-
-Run linting:
-
-```bash
-npm run lint
-```
-
 ## Admin Access
 
 Use these credentials to manage quizzes:
