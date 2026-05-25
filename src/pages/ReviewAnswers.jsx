@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 export function ReviewAnswers({ activeQuizId, quizzes }) {
   const { quizId } = useParams();
@@ -6,9 +6,10 @@ export function ReviewAnswers({ activeQuizId, quizzes }) {
   const quiz = quizzes.find((item) => item.id === selectedQuizId) || quizzes[0];
   const questions = quiz?.questions || [];
   const navigate = useNavigate();
-  const selectedAnswers = quiz
-    ? JSON.parse(localStorage.getItem(`selected-${quiz.id}`)) || {}
-    : {};
+  const location = useLocation();
+  const selectedAnswers =
+    location.state?.selectedAnswers ||
+    (quiz ? JSON.parse(localStorage.getItem(`selected-${quiz.id}`)) || {} : {});
 
   const missedQuestions = questions.filter((question) => {
     return selectedAnswers[question.id] !== question.answer;
@@ -41,7 +42,11 @@ export function ReviewAnswers({ activeQuizId, quizzes }) {
                 Try Again
               </button>
             )}
-            <Link className="secondary-link" to={quiz ? `/result/${quiz.id}` : "/result"}>
+            <Link
+              className="secondary-link"
+              to={quiz ? `/result/${quiz.id}` : "/result"}
+              state={{ selectedAnswers }}
+            >
               Back to Result
             </Link>
           </div>

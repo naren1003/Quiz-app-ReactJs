@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 export function Result({
   activeQuizId,
@@ -9,9 +9,10 @@ export function Result({
   const selectedQuizId = quizId || activeQuizId;
   const quiz = quizzes.find((item) => item.id === selectedQuizId) || quizzes[0];
   const questions = quiz?.questions || [];
-  const selectedAnswers = quiz
-    ? JSON.parse(localStorage.getItem(`selected-${quiz.id}`)) || {}
-    : {};
+  const location = useLocation();
+  const selectedAnswers =
+    location.state?.selectedAnswers ||
+    (quiz ? JSON.parse(localStorage.getItem(`selected-${quiz.id}`)) || {} : {});
   const storedResult = questions.reduce((acc, question) => {
     return acc + (selectedAnswers[question.id] === question.answer ? 1 : 0);
   }, 0);
@@ -55,7 +56,11 @@ export function Result({
           <button className="primary-btn" onClick={restartQuiz}>
             Try Again
           </button>
-          <Link className="secondary-link" to={`/review/${quiz.id}`}>
+          <Link
+            className="secondary-link"
+            to={`/review/${quiz.id}`}
+            state={{ selectedAnswers }}
+          >
             Review Missed ({missedCount})
           </Link>
           <Link className="secondary-link" to="/setQuiz">

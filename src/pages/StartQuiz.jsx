@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { Timer } from "./Timer";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -22,12 +22,8 @@ export function StartQuiz({
   });
 
   const [submit, setSubmit] = useState(0);
+  const hasSubmittedRef = useRef(false);
   const navigate = useNavigate();
-  const submitQuiz = useCallback(() => {
-    setSubmit(1);
-    localStorage.removeItem(timerStorageKey);
-  }, [timerStorageKey]);
-
   const selected = useMemo(() => {
     return selectedState.storageKey === selectedStorageKey
       ? selectedState.answers
@@ -35,31 +31,39 @@ export function StartQuiz({
   }, [selectedState, selectedStorageKey]);
   const answeredCount = Object.keys(selected).length;
 
+  const submitQuiz = useCallback(() => {
+    if (!quiz || hasSubmittedRef.current) return;
+
+    hasSubmittedRef.current = true;
+    setSubmit(1);
+    setCorrectAnswers({});
+    localStorage.removeItem(timerStorageKey);
+    localStorage.removeItem(selectedStorageKey);
+    navigate(`/result/${quiz.id}`, {
+      state: {
+        selectedAnswers: selected,
+      },
+    });
+  }, [
+    navigate,
+    quiz,
+    selected,
+    selectedStorageKey,
+    setCorrectAnswers,
+    timerStorageKey,
+  ]);
+
   useEffect(() => {
+    if (submit === 1) return;
+
     localStorage.setItem(selectedStorageKey, JSON.stringify(selected));
-  }, [selected, selectedStorageKey]);
+  }, [selected, selectedStorageKey, submit]);
 
   useEffect(() => {
     if (submit === 1) {
-      navigate(`/result/${quiz.id}`);
+      submitQuiz();
     }
-  }, [quiz, submit, navigate]);
-
-  useEffect(() => {
-    if (!questions.length || submit === 1) return;
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        submitQuiz();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [questions.length, submit, submitQuiz]);
+  }, [submit, submitQuiz]);
 
   if (!questions.length) {
     return (
