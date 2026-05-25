@@ -2,9 +2,6 @@
 
 QuizMaster is a React quiz application built with Vite. It lets users select and take timed quizzes, view their score, review missed answers, and manage quiz content through a simple admin area.
 
-# Live Demo
-quiz-app-react-js-lac.vercel.app
-
 ## Features
 
 - Home screen with available quiz selection
@@ -26,6 +23,38 @@ quiz-app-react-js-lac.vercel.app
 - Vite
 - ESLint
 - React Compiler through the Vite/Babel setup
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+Run linting:
+
+```bash
+npm run lint
+```
 
 ## Admin Access
 
