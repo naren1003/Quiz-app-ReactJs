@@ -1,18 +1,109 @@
-# React + Vite
+# QuizMaster
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+QuizMaster is a React quiz application built with Vite. It lets users select and take timed quizzes, view their score, review missed answers, and manage quiz content through a simple admin area.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Home screen with available quiz selection
+- Default "Web Basics Quiz" with starter questions
+- Admin sign-in for quiz management
+- Create multiple quizzes
+- Add and delete questions
+- Set a per-quiz time limit
+- Timed quiz attempts with persisted progress
+- Automatic submission when time runs out
+- Score summary with percentage result
+- Review page for incorrect or unanswered questions
+- Browser `localStorage` persistence for quizzes, active quiz, answers, timer state, and admin session
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- React 19
+- React Router
+- Vite
+- ESLint
+- React Compiler through the Vite/Babel setup
 
-Note: This will impact Vite dev & build performances.
+## Getting Started
 
-## Expanding the ESLint configuration
+Install dependencies:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+Run linting:
+
+```bash
+npm run lint
+```
+
+## Admin Access
+
+Use these credentials to manage quizzes:
+
+```text
+Username: admin
+Password: quiz123
+```
+
+The admin session is stored in `localStorage` under `quizAdminAuthenticated`.
+
+## App Routes
+
+- `/` - Home page and quiz selector
+- `/login` - Admin login
+- `/setQuiz` - Protected quiz builder and question manager
+- `/quiz` or `/quiz/:quizId` - Quiz attempt screen
+- `/result` or `/result/:quizId` - Score summary
+- `/review` or `/review/:quizId` - Review missed or unanswered questions
+
+## Project Structure
+
+```text
+src/
+  App.jsx                 App state, default quiz data, and routes
+  main.jsx                React entry point
+  App.css                 Shared application styles
+  index.css               Global styles
+  pages/
+    Home.jsx              Landing page and quiz picker
+    Login.jsx             Admin authentication screen
+    SetQuestion.jsx       Quiz and question management
+    StartQuiz.jsx         Quiz attempt flow
+    Timer.jsx             Countdown timer
+    Result.jsx            Score display
+    ReviewAnswers.jsx     Missed answer review
+```
+
+## Data Storage
+
+This app does not use a backend. Quiz data and in-progress attempts are saved in the browser with `localStorage`.
+
+Important keys include:
+
+- `quizzes` - saved quiz list
+- `activeQuizId` - currently selected quiz
+- `selected-<quizId>` - answers selected during a quiz attempt
+- `quizTimer-<quizId>` - remaining timer value for an active attempt
+- `quizAdminAuthenticated` - admin login state
+
+Clearing browser site data resets saved quizzes, progress, and the admin session.
