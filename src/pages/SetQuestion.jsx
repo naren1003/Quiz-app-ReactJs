@@ -7,7 +7,12 @@ const emptyForm = {
   answer: "",
 };
 
-export function SetQuestions({ questions, setQuestions, setCorrectAnswers }) {
+export function SetQuestions({
+  questions,
+  setQuestions,
+  setCorrectAnswers,
+  onLogout,
+}) {
   const [form, setForm] = useState(emptyForm);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -62,10 +67,22 @@ export function SetQuestions({ questions, setQuestions, setCorrectAnswers }) {
     saveQuestions(questions.filter((question) => question.id !== id));
   };
 
+  const logout = () => {
+    onLogout();
+    navigate("/");
+  };
+
   return (
     <main className="app-page">
       <section className="builder-layout">
         <div className="page-card question-builder">
+          <div className="admin-bar">
+            <span>Admin mode</span>
+            <button className="ghost-btn" type="button" onClick={logout}>
+              Logout
+            </button>
+          </div>
+
           <div className="section-heading">
             <span className="eyebrow">Set Question</span>
             <h1>Create a quiz question</h1>

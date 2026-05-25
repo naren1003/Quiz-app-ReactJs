@@ -52,7 +52,8 @@ a {
 }
 
 .home-page,
-.result-page {
+.result-page,
+.auth-page {
   display: grid;
   place-items: center;
 }
@@ -70,6 +71,11 @@ a {
   max-width: 760px;
   padding: 52px;
   text-align: center;
+}
+
+.auth-card {
+  max-width: 520px;
+  padding: 34px;
 }
 
 .eyebrow {
@@ -373,6 +379,10 @@ a {
   box-shadow: 0 0 0 3px rgba(35, 100, 170, 0.14);
 }
 
+.auth-form {
+  margin-top: 24px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -383,6 +393,27 @@ a {
   margin: 0;
   color: var(--green-dark);
   font-weight: 800;
+}
+
+.form-error {
+  color: #a8372f;
+}
+
+.admin-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-bar span {
+  color: var(--green-dark);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .question-preview-list {

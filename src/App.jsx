@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
 import { SetQuestions } from "./pages/SetQuestion";
 import { StartQuiz } from "./pages/StartQuiz";
 import { Result } from "./pages/Result";
@@ -80,24 +81,52 @@ const defaultQuestions = [
 ];
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("quizAdminAuthenticated") === "true";
+  });
   const [questions, setQuestions] = useState(() => {
     const savedQuestions = JSON.parse(localStorage.getItem("questions"));
     return savedQuestions?.length ? savedQuestions : defaultQuestions;
   });
   const [correctAnswers, setCorrectAnswers] = useState({});
 
+  const handleLogin = () => {
+    localStorage.setItem("quizAdminAuthenticated", "true");
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("quizAdminAuthenticated");
+    setIsAuthenticated(false);
+  };
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/setQuiz" replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
           path="setQuiz"
           element={
-            <SetQuestions
-              questions={questions}
-              setQuestions={setQuestions}
-              setCorrectAnswers={setCorrectAnswers}
-            />
+            isAuthenticated ? (
+              <SetQuestions
+                questions={questions}
+                setQuestions={setQuestions}
+                setCorrectAnswers={setCorrectAnswers}
+                onLogout={handleLogout}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
