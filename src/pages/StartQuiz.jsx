@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { Timer } from "./Timer";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,6 +23,11 @@ export function StartQuiz({
 
   const [submit, setSubmit] = useState(0);
   const navigate = useNavigate();
+  const submitQuiz = useCallback(() => {
+    setSubmit(1);
+    localStorage.removeItem(timerStorageKey);
+  }, [timerStorageKey]);
+
   const selected = useMemo(() => {
     return selectedState.storageKey === selectedStorageKey
       ? selectedState.answers
@@ -39,6 +44,22 @@ export function StartQuiz({
       navigate(`/result/${quiz.id}`);
     }
   }, [quiz, submit, navigate]);
+
+  useEffect(() => {
+    if (!questions.length || submit === 1) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        submitQuiz();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [questions.length, submit, submitQuiz]);
 
   if (!questions.length) {
     return (
@@ -126,10 +147,7 @@ export function StartQuiz({
         <div className="submit-bar">
           <button
             className="primary-btn"
-            onClick={() => {
-              setSubmit(1);
-              localStorage.removeItem(timerStorageKey);
-            }}
+            onClick={submitQuiz}
           >
             Submit
           </button>
