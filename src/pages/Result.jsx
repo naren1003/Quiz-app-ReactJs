@@ -1,25 +1,38 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-export function Result({ questions, correctAnswers, setCorrectAnswers }) {
-  const result = Object.values(correctAnswers).reduce((acc, value) => {
-    return acc + value;
+export function Result({
+  activeQuizId,
+  quizzes,
+  setCorrectAnswers,
+}) {
+  const { quizId } = useParams();
+  const selectedQuizId = quizId || activeQuizId;
+  const quiz = quizzes.find((item) => item.id === selectedQuizId) || quizzes[0];
+  const questions = quiz?.questions || [];
+  const selectedAnswers = quiz
+    ? JSON.parse(localStorage.getItem(`selected-${quiz.id}`)) || {}
+    : {};
+  const storedResult = questions.reduce((acc, question) => {
+    return acc + (selectedAnswers[question.id] === question.answer ? 1 : 0);
   }, 0);
+  const result = storedResult;
   const totalQuestions = questions.length;
   const percentage = totalQuestions ? Math.round((result / totalQuestions) * 100) : 0;
+  const missedCount = totalQuestions - result;
   const navigate = useNavigate();
 
   const restartQuiz = () => {
     setCorrectAnswers({});
-    localStorage.removeItem("quizTimer");
-    localStorage.removeItem("selected");
-    navigate("/quiz");
+    localStorage.removeItem(`quizTimer-${quiz.id}`);
+    localStorage.removeItem(`selected-${quiz.id}`);
+    navigate(`/quiz/${quiz.id}`);
   };
 
   return (
     <main className="app-page result-page">
       <section className="page-card result-card">
         <span className="eyebrow">Result</span>
-        <h1>Your Score</h1>
+        <h1>{quiz?.title || "Your Score"}</h1>
 
         <div className="score-ring" style={{ "--score": `${percentage}%` }}>
           <div>
@@ -42,6 +55,9 @@ export function Result({ questions, correctAnswers, setCorrectAnswers }) {
           <button className="primary-btn" onClick={restartQuiz}>
             Try Again
           </button>
+          <Link className="secondary-link" to={`/review/${quiz.id}`}>
+            Review Missed ({missedCount})
+          </Link>
           <Link className="secondary-link" to="/setQuiz">
             Edit Questions
           </Link>

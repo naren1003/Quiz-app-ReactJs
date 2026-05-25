@@ -4,6 +4,7 @@ import { Login } from "./pages/Login";
 import { SetQuestions } from "./pages/SetQuestion";
 import { StartQuiz } from "./pages/StartQuiz";
 import { Result } from "./pages/Result";
+import { ReviewAnswers } from "./pages/ReviewAnswers";
 import "./App.css";
 import { useState } from "react";
 
@@ -80,15 +81,51 @@ const defaultQuestions = [
   },
 ];
 
+const createDefaultQuiz = (questions = defaultQuestions) => ({
+  id: "default-quiz",
+  title: "Web Basics Quiz",
+  durationMinutes: 10,
+  questions,
+});
+
+const loadSavedQuizzes = () => {
+  const savedQuizzes = JSON.parse(localStorage.getItem("quizzes"));
+  if (savedQuizzes?.length) {
+    return savedQuizzes;
+  }
+
+  const savedQuestions = JSON.parse(localStorage.getItem("questions"));
+  return [createDefaultQuiz(savedQuestions?.length ? savedQuestions : defaultQuestions)];
+};
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("quizAdminAuthenticated") === "true";
   });
-  const [questions, setQuestions] = useState(() => {
-    const savedQuestions = JSON.parse(localStorage.getItem("questions"));
-    return savedQuestions?.length ? savedQuestions : defaultQuestions;
+  const [quizzes, setQuizzes] = useState(() => {
+    return loadSavedQuizzes();
+  });
+  const [activeQuizId, setActiveQuizId] = useState(() => {
+    return localStorage.getItem("activeQuizId") || "default-quiz";
   });
   const [correctAnswers, setCorrectAnswers] = useState({});
+
+  const saveQuizzes = (nextQuizzes) => {
+    setQuizzes(nextQuizzes);
+    localStorage.setItem("quizzes", JSON.stringify(nextQuizzes));
+
+    if (!nextQuizzes.some((quiz) => quiz.id === activeQuizId)) {
+      const nextActiveId = nextQuizzes[0]?.id || "";
+      setActiveQuizId(nextActiveId);
+      localStorage.setItem("activeQuizId", nextActiveId);
+    }
+  };
+
+  const selectQuiz = (quizId) => {
+    setActiveQuizId(quizId);
+    localStorage.setItem("activeQuizId", quizId);
+    setCorrectAnswers({});
+  };
 
   const handleLogin = () => {
     localStorage.setItem("quizAdminAuthenticated", "true");
@@ -103,7 +140,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            <Home
+              activeQuizId={activeQuizId}
+              quizzes={quizzes}
+              selectQuiz={selectQuiz}
+            />
+          }
+        />
         <Route
           path="/login"
           element={
@@ -119,8 +165,10 @@ function App() {
           element={
             isAuthenticated ? (
               <SetQuestions
-                questions={questions}
-                setQuestions={setQuestions}
+                activeQuizId={activeQuizId}
+                quizzes={quizzes}
+                saveQuizzes={saveQuizzes}
+                selectQuiz={selectQuiz}
                 setCorrectAnswers={setCorrectAnswers}
                 onLogout={handleLogout}
               />
@@ -133,7 +181,19 @@ function App() {
           path="/quiz"
           element={
             <StartQuiz
-              questions={questions}
+              activeQuizId={activeQuizId}
+              quizzes={quizzes}
+              correctAnswers={correctAnswers}
+              setCorrectAnswers={setCorrectAnswers}
+            />
+          }
+        />
+        <Route
+          path="/quiz/:quizId"
+          element={
+            <StartQuiz
+              activeQuizId={activeQuizId}
+              quizzes={quizzes}
               correctAnswers={correctAnswers}
               setCorrectAnswers={setCorrectAnswers}
             />
@@ -143,11 +203,31 @@ function App() {
           path="/result"
           element={
             <Result
-              questions={questions}
+              activeQuizId={activeQuizId}
+              quizzes={quizzes}
               correctAnswers={correctAnswers}
               setCorrectAnswers={setCorrectAnswers}
             />
           }
+        />
+        <Route
+          path="/result/:quizId"
+          element={
+            <Result
+              activeQuizId={activeQuizId}
+              quizzes={quizzes}
+              correctAnswers={correctAnswers}
+              setCorrectAnswers={setCorrectAnswers}
+            />
+          }
+        />
+        <Route
+          path="/review"
+          element={<ReviewAnswers activeQuizId={activeQuizId} quizzes={quizzes} />}
+        />
+        <Route
+          path="/review/:quizId"
+          element={<ReviewAnswers activeQuizId={activeQuizId} quizzes={quizzes} />}
         />
       </Routes>
     </BrowserRouter>

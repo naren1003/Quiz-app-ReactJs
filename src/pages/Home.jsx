@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 
-export function Home() {
+export function Home({ activeQuizId, quizzes, selectQuiz }) {
   const navigate = useNavigate();
+  const activeQuiz = quizzes.find((quiz) => quiz.id === activeQuizId) || quizzes[0];
 
   return (
     <div className="app-page home-page">
@@ -18,10 +19,10 @@ export function Home() {
           <button
             className="start-btn"
             onClick={() => {
-              navigate("/quiz");
+              navigate(`/quiz/${activeQuiz.id}`);
             }}
           >
-            Start Quiz
+            Start Selected Quiz
           </button>
           <button
             className="create-btn"
@@ -33,21 +34,19 @@ export function Home() {
           </button>
         </div>
 
-        <div className="stats-container">
-          <div className="stat-box">
-            <h2>100+</h2>
-            <p>Quizzes</p>
-          </div>
-
-          <div className="stat-box">
-            <h2>50+</h2>
-            <p>Categories</p>
-          </div>
-
-          <div className="stat-box">
-            <h2>Unlimited</h2>
-            <p>Learning Fun</p>
-          </div>
+        <div className="quiz-picker">
+          {quizzes.map((quiz) => (
+            <button
+              className={`quiz-option ${quiz.id === activeQuiz?.id ? "is-active" : ""}`}
+              key={quiz.id}
+              type="button"
+              onClick={() => selectQuiz(quiz.id)}
+            >
+              <span>{quiz.durationMinutes} min</span>
+              <strong>{quiz.title}</strong>
+              <small>{quiz.questions.length} questions</small>
+            </button>
+          ))}
         </div>
       </div>
     </div>

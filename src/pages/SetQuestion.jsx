@@ -8,14 +8,26 @@ const emptyForm = {
 };
 
 export function SetQuestions({
-  questions,
-  setQuestions,
+  activeQuizId,
+  quizzes,
+  saveQuizzes,
+  selectQuiz,
   setCorrectAnswers,
   onLogout,
 }) {
   const [form, setForm] = useState(emptyForm);
+  const [quizTitle, setQuizTitle] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const activeQuiz = quizzes.find((quiz) => quiz.id === activeQuizId) || quizzes[0];
+  const questions = activeQuiz?.questions || [];
+
+  const resetQuizAttempt = (quizId = activeQuiz?.id) => {
+    if (!quizId) return;
+    localStorage.removeItem(`selected-${quizId}`);
+    localStorage.removeItem(`quizTimer-${quizId}`);
+    setCorrectAnswers({});
+  };
 
   const updateOption = (index, value) => {
     const nextOptions = [...form.options];
@@ -23,12 +35,18 @@ export function SetQuestions({
     setForm({ ...form, options: nextOptions });
   };
 
+  const updateActiveQuiz = (updates) => {
+    if (!activeQuiz) return;
+
+    const nextQuizzes = quizzes.map((quiz) =>
+      quiz.id === activeQuiz.id ? { ...quiz, ...updates } : quiz
+    );
+    saveQuizzes(nextQuizzes);
+    resetQuizAttempt(activeQuiz.id);
+  };
+
   const saveQuestions = (nextQuestions) => {
-    setQuestions(nextQuestions);
-    localStorage.setItem("questions", JSON.stringify(nextQuestions));
-    localStorage.removeItem("selected");
-    localStorage.removeItem("quizTimer");
-    setCorrectAnswers({});
+    updateActiveQuiz({ questions: nextQuestions });
   };
 
   const handleSubmit = (event) => {
@@ -67,6 +85,55 @@ export function SetQuestions({
     saveQuestions(questions.filter((question) => question.id !== id));
   };
 
+  const createQuiz = (event) => {
+    event.preventDefault();
+
+    const title = quizTitle.trim();
+    if (!title) {
+      setMessage("Please enter a quiz title.");
+      return;
+    }
+
+    const newQuiz = {
+      id: `quiz-${Date.now()}`,
+      title,
+      durationMinutes: 10,
+      questions: [],
+    };
+
+    saveQuizzes([...quizzes, newQuiz]);
+    selectQuiz(newQuiz.id);
+    setQuizTitle("");
+    setForm(emptyForm);
+    setMessage("New quiz created. Add questions when you are ready.");
+  };
+
+  const deleteQuiz = (quizId) => {
+    if (quizzes.length === 1) {
+      setMessage("Keep at least one quiz available.");
+      return;
+    }
+
+    const nextQuizzes = quizzes.filter((quiz) => quiz.id !== quizId);
+    localStorage.removeItem(`selected-${quizId}`);
+    localStorage.removeItem(`quizTimer-${quizId}`);
+    saveQuizzes(nextQuizzes);
+    selectQuiz(nextQuizzes[0].id);
+    setMessage("Quiz deleted.");
+  };
+
+  const updateDuration = (value) => {
+    const durationMinutes = Number(value);
+
+    if (!Number.isInteger(durationMinutes) || durationMinutes < 1) {
+      setMessage("Quiz time must be at least 1 minute.");
+      return;
+    }
+
+    updateActiveQuiz({ durationMinutes });
+    setMessage("Quiz time updated.");
+  };
+
   const logout = () => {
     onLogout();
     navigate("/");
@@ -84,10 +151,53 @@ export function SetQuestions({
           </div>
 
           <div className="section-heading">
-            <span className="eyebrow">Set Question</span>
-            <h1>Create a quiz question</h1>
-            <p>Add a question with four options, then choose the correct answer.</p>
+            <span className="eyebrow">Set Quiz</span>
+            <h1>{activeQuiz?.title || "Create a quiz"}</h1>
+            <p>Add questions, choose the correct answers, and set the quiz time.</p>
           </div>
+
+          <form className="quiz-settings" onSubmit={createQuiz}>
+            <label>
+              Active Quiz
+              <select
+                value={activeQuiz?.id || ""}
+                onChange={(event) => {
+                  selectQuiz(event.target.value);
+                  setForm(emptyForm);
+                  setMessage("");
+                }}
+              >
+                {quizzes.map((quiz) => (
+                  <option key={quiz.id} value={quiz.id}>
+                    {quiz.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Time Limit (minutes)
+              <input
+                min="1"
+                type="number"
+                value={activeQuiz?.durationMinutes || 1}
+                onChange={(event) => updateDuration(event.target.value)}
+              />
+            </label>
+
+            <label>
+              New Quiz Title
+              <input
+                value={quizTitle}
+                onChange={(event) => setQuizTitle(event.target.value)}
+                placeholder="Example: JavaScript Basics"
+              />
+            </label>
+
+            <button className="secondary-btn" type="submit">
+              Create Quiz
+            </button>
+          </form>
 
           <form className="question-form" onSubmit={handleSubmit}>
             <label>
@@ -143,7 +253,7 @@ export function SetQuestions({
               <button
                 className="secondary-btn"
                 type="button"
-                onClick={() => navigate("/quiz")}
+                onClick={() => navigate(`/quiz/${activeQuiz.id}`)}
               >
                 Start Quiz
               </button>
@@ -155,6 +265,21 @@ export function SetQuestions({
           <div className="section-heading">
             <span className="eyebrow">Question Bank</span>
             <h2>{questions.length} questions ready</h2>
+          </div>
+
+          <div className="quiz-summary-list">
+            {quizzes.map((quiz) => (
+              <button
+                className={`quiz-summary ${quiz.id === activeQuiz?.id ? "is-active" : ""}`}
+                key={quiz.id}
+                type="button"
+                onClick={() => selectQuiz(quiz.id)}
+              >
+                <span>{quiz.durationMinutes} min</span>
+                <strong>{quiz.title}</strong>
+                <small>{quiz.questions.length} questions</small>
+              </button>
+            ))}
           </div>
 
           <div className="question-preview-list">
@@ -178,7 +303,16 @@ export function SetQuestions({
 
           <nav className="page-nav">
             <Link to="/">Home</Link>
-            <Link to="/quiz">Start Quiz</Link>
+            {activeQuiz && <Link to={`/quiz/${activeQuiz.id}`}>Start Quiz</Link>}
+            {activeQuiz && (
+              <button
+                className="link-button"
+                type="button"
+                onClick={() => deleteQuiz(activeQuiz.id)}
+              >
+                Delete Quiz
+              </button>
+            )}
           </nav>
         </aside>
       </section>

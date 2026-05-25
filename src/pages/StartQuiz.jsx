@@ -1,25 +1,44 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Timer } from "./Timer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-export function StartQuiz({ questions, setCorrectAnswers, correctAnswers }) {
-  const [selected, setSelected] = useState(() => {
-    return JSON.parse(localStorage.getItem("selected")) || {};
+export function StartQuiz({
+  activeQuizId,
+  quizzes,
+  setCorrectAnswers,
+  correctAnswers,
+}) {
+  const { quizId } = useParams();
+  const selectedQuizId = quizId || activeQuizId;
+  const quiz = quizzes.find((item) => item.id === selectedQuizId) || quizzes[0];
+  const questions = quiz?.questions || [];
+  const selectedStorageKey = quiz ? `selected-${quiz.id}` : "selected";
+  const timerStorageKey = quiz ? `quizTimer-${quiz.id}` : "quizTimer";
+  const [selectedState, setSelectedState] = useState(() => {
+    return {
+      storageKey: selectedStorageKey,
+      answers: JSON.parse(localStorage.getItem(selectedStorageKey)) || {},
+    };
   });
 
   const [submit, setSubmit] = useState(0);
   const navigate = useNavigate();
+  const selected = useMemo(() => {
+    return selectedState.storageKey === selectedStorageKey
+      ? selectedState.answers
+      : JSON.parse(localStorage.getItem(selectedStorageKey)) || {};
+  }, [selectedState, selectedStorageKey]);
   const answeredCount = Object.keys(selected).length;
 
   useEffect(() => {
-    localStorage.setItem("selected", JSON.stringify(selected));
-  }, [selected]);
+    localStorage.setItem(selectedStorageKey, JSON.stringify(selected));
+  }, [selected, selectedStorageKey]);
 
   useEffect(() => {
     if (submit === 1) {
-      navigate("/result");
+      navigate(`/result/${quiz.id}`);
     }
-  }, [submit, navigate]);
+  }, [quiz, submit, navigate]);
 
   if (!questions.length) {
     return (
@@ -42,9 +61,14 @@ export function StartQuiz({ questions, setCorrectAnswers, correctAnswers }) {
         <div className="quiz-header">
           <div>
             <span className="eyebrow">Live Quiz</span>
-            <h1>Choose the correct answers</h1>
+            <h1>{quiz.title}</h1>
           </div>
-          <Timer setSubmit={setSubmit} />
+          <Timer
+            key={timerStorageKey}
+            durationMinutes={quiz.durationMinutes}
+            setSubmit={setSubmit}
+            storageKey={timerStorageKey}
+          />
         </div>
 
         <div className="progress-card">
@@ -78,9 +102,12 @@ export function StartQuiz({ questions, setCorrectAnswers, correctAnswers }) {
                     onChange={(event) => {
                       const value = event.target.value;
 
-                      setSelected({
-                        ...selected,
-                        [eachQuestion.id]: value,
+                      setSelectedState({
+                        storageKey: selectedStorageKey,
+                        answers: {
+                          ...selected,
+                          [eachQuestion.id]: value,
+                        },
                       });
 
                       setCorrectAnswers({
@@ -101,8 +128,7 @@ export function StartQuiz({ questions, setCorrectAnswers, correctAnswers }) {
             className="primary-btn"
             onClick={() => {
               setSubmit(1);
-              localStorage.removeItem("quizTimer");
-              localStorage.removeItem("selected");
+              localStorage.removeItem(timerStorageKey);
             }}
           >
             Submit
